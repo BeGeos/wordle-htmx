@@ -1,0 +1,27 @@
+---
+interface Props {
+  key: string;
+  large?: boolean;
+  status?: 'wrong' | 'wrong-location' | 'correct' | 'initial';
+}
+
+const { key, large = false, status = 'initial' } = Astro.props;
+const disabled = key === '';
+---
+
+<button
+  data-role='key'
+  data-key={key}
+  disabled={disabled}
+  class:list={[
+    {
+      large,
+      'opacity-0': disabled,
+      correct: status === 'correct',
+      wrong: status === 'wrong',
+      'wrong-location': status === 'wrong-location',
+    },
+  ]}
+  class='uppercase rounded-md bg-neutral-600 text-white place-self-end min-w-full font-bold text-lg sm:text-2xl p-5 hover:bg-neutral-500 transition-all'
+  >{key}</button
+>

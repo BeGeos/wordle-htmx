@@ -1,0 +1,73 @@
+---
+import type { Cell } from '../stores/grid';
+
+import WordleCell from '../components/partials/Cell.astro';
+import { createGrid, INITIAL_VALUE, COLS, ROWS } from '../stores/grid';
+import { createPager } from '../stores/pager';
+
+export const partial = true;
+
+export const prerender = false;
+
+type Opts = {
+  page: number;
+};
+
+const getKey = (text: string) => {
+  const [_, key] = text.split('=');
+  return key;
+};
+
+const getUpdatedGrid = (
+  key: string,
+  values: Cell[],
+  opts: Opts
+): Cell[] | null | undefined => {
+  const temp = structuredClone(values);
+  const index = temp.findIndex((cell) => !cell.filled);
+
+  // When it goes beyond the last page just don't do anything
+  if (opts.page === ROWS + 1) return;
+
+  if (key === 'Enter') return;
+
+  if (key === 'Backspace' || key === 'Delete' || key === 'Back') {
+    const previousIndex = index > 0 ? index - 1 : temp.length - 1;
+    const toBeDeleted = temp[previousIndex];
+
+    if (toBeDeleted.checked) return;
+    temp[previousIndex] = INITIAL_VALUE;
+    return temp;
+  }
+
+  // Check if word needs to be submitted
+  const filled = temp.filter((cell) => cell.filled);
+  if (filled.length === opts.page * COLS) return;
+
+  if (key.match(/^[a-z]$/i)) {
+    const updated: Cell = {
+      filled: true,
+      letter: key,
+      status: 'initial',
+      checked: false,
+    };
+
+    temp[index] = updated;
+
+    return temp;
+  }
+};
+
+const grid = createGrid();
+const pager = createPager();
+
+const { request } = Astro;
+const key = getKey(await request.text());
+const updatedGrid = getUpdatedGrid(key, grid.grid, { page: pager.page });
+
+if (updatedGrid) {
+  grid.update(updatedGrid);
+}
+---
+
+{grid.grid.map((cell) => <WordleCell {...cell} />)}

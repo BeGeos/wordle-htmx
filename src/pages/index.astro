@@ -1,0 +1,71 @@
+---
+import BaseLayout from '../layouts/Base.astro';
+
+import { createGrid } from '../stores/grid';
+import { createPager } from '../stores/pager';
+import { createKeyboard } from '../stores/keyboard';
+
+import WordleGrid from '../components/partials/Grid.astro';
+import Keyboard from '../components/Keyboard.astro';
+import { createChecker } from '../stores/checker';
+
+const grid = createGrid();
+const pager = createPager();
+const keyboard = createKeyboard();
+const checker = createChecker();
+
+grid.reset();
+pager.reset();
+keyboard.reset();
+checker.reset();
+---
+
+<script>
+  const updateWordle = (key: string) => {
+    //@ts-ignore
+    htmx.ajax('POST', '/input', {
+      target: '#wordle-grid',
+      swap: 'innerHTML',
+      values: { key },
+    });
+  };
+
+  const checkWordle = () => {
+    //@ts-ignore
+    htmx.ajax('POST', '/check', {
+      target: '#wordle-grid',
+      swap: 'innerHTML',
+    });
+  };
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') return checkWordle();
+
+    return updateWordle(event.key);
+  });
+
+  document.addEventListener('click', (event) => {
+    const target = event.target as HTMLElement;
+
+    if (target.getAttribute('data-role') === 'key') {
+      const value = target.getAttribute('data-key');
+
+      if (value === 'Enter') return checkWordle();
+
+      return updateWordle(value!);
+    }
+  });
+</script>
+
+<BaseLayout title='Home'>
+  <main
+    class='min-h-screen py-12 flex flex-col items-center justify-center bg-neutral-900 text-neutral-50'
+  >
+    <header>
+      <h1 class='text-4xl sm:text-5xl font-bold text-center'>Wordle HTMX</h1>
+    </header>
+    <WordleGrid values={grid.grid} />
+
+    <Keyboard keys={keyboard.keys} />
+  </main>
+</BaseLayout>

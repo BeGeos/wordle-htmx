@@ -1,0 +1,18 @@
+---
+import type { Cell } from '../../stores/grid';
+
+interface Props extends Cell {}
+
+const { letter = '', status = 'initial', filled = false } = Astro.props;
+---
+
+<div
+  class='cell'
+  class:list={{
+    correct: status === 'correct',
+    wrong: status === 'wrong',
+    'wrong-location': status === 'wrong-location',
+  }}
+>
+  {letter.toUpperCase()}
+</div>

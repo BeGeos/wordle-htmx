@@ -1,0 +1,28 @@
+---
+import '../styles/app.css';
+
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<html lang='en'>
+  <head>
+    <meta charset='utf-8' />
+    <link rel='icon' type='image/svg+xml' href='/favicon.svg' />
+    <meta name='viewport' content='width=device-width' />
+    <meta name='generator' content={Astro.generator} />
+    <title>{title} | Wordle HTMX</title>
+
+    <!-- HTMX -->
+    <script
+      src='https://unpkg.com/htmx.org@1.9.11'
+      integrity='sha384-0gxUXCCR8yv9FM2b+U3FDbsKthCI66oH5IA9fHppQq9DDMHuMauqq1ZHBpJxQ0J0'
+      crossorigin='anonymous'></script>
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

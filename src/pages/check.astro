@@ -1,0 +1,82 @@
+---
+import type { CheckedCells } from '../stores/checker';
+
+import WordleCell from '../components/partials/Cell.astro';
+import Keyboard from '../components/Keyboard.astro';
+
+import { createChecker } from '../stores/checker';
+import { createGrid, COLS, ROWS } from '../stores/grid';
+import { createPager } from '../stores/pager';
+import { createKeyboard } from '../stores/keyboard';
+
+export const partial = true;
+
+const pager = createPager();
+const grid = createGrid();
+const checker = createChecker();
+const keyboard = createKeyboard();
+
+const head =
+  pager.page === 1 ? [] : grid.grid.slice(0, pager.page * COLS - COLS);
+const tail = pager.page === ROWS ? [] : grid.grid.slice(pager.page * COLS);
+const row = grid.grid.slice(
+  pager.page * COLS - COLS,
+  pager.page * COLS
+) as CheckedCells;
+const isValid = row.every((cell) => cell.filled);
+const word = row.map((cell) => cell.letter).join('');
+
+const isWord = checker.isWord(word);
+let error = null;
+
+if (!isWord) {
+  error = 'This is not a word';
+}
+
+if (isValid && !checker.winner && checker.canPlay && isWord) {
+  const checked = checker.check(row);
+  const updated = [...head, ...checked, ...tail];
+  const updatedKeyboard = checker.updateKeys(updated, keyboard.keys);
+
+  grid.update(updated);
+  keyboard.update(updatedKeyboard);
+
+  const hasLost = checker.hasLost(checked, pager.page);
+  if (hasLost) {
+    checker.endGame();
+  }
+
+  pager.increment();
+
+  const hasWon = checker.hasWon(checked);
+  if (hasWon) {
+    checker.setWinner();
+  }
+}
+---
+
+<Keyboard keys={keyboard.keys} />
+
+{
+  !checker.canPlay && (
+    <p class='col-span-5 text-xl font-bold text-red-400 p-4 rounded-md border border-red-400'>
+      Oops you lost
+    </p>
+  )
+}
+{
+  error && (
+    <p class='col-span-5 text-xl font-bold text-red-400 p-4 rounded-md border border-red-400'>
+      {error}
+    </p>
+  )
+}
+{
+  checker.winner && (
+    <p class='col-span-5 text-xl font-bold text-green-400 p-4 rounded-md border border-green-400'>
+      {' '}
+      You guessed it!
+    </p>
+  )
+}
+{grid.grid.map((cell) => <WordleCell {...cell} />)}

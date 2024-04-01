@@ -1,0 +1,26 @@
+---
+import type { Key as KeyType } from '../stores/keyboard';
+import Key from './Key.astro';
+
+interface Props {
+  keys: KeyType[];
+}
+
+const { keys } = Astro.props;
+---
+
+<div
+  id='keyboard'
+  class='grid gap-2 grid-cols-11 grid-rows-3'
+  hx-swap-oob='true'
+>
+  {
+    keys.map(({ key, status }) => (
+      <Key
+        key={key}
+        status={status}
+        large={key === 'Enter' || key === 'Back'}
+      />
+    ))
+  }
+</div>

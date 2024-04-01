@@ -1,0 +1,39 @@
+@tailwind components;
+@tailwind utilities;
+@tailwind base;
+
+@layer utilities {
+    [data-role='key'].large {
+        @apply col-span-2
+    }
+}
+
+@layer components {
+    .cell {
+        @apply border-neutral-700 border-2 h-16 w-16 flex items-center justify-center font-bold text-xl hover:bg-neutral-700 transition-all
+    }
+
+    .cell.correct {
+        @apply bg-green-700 border-green-700
+    }
+
+    .cell.wrong {
+        @apply bg-neutral-700 border-neutral-700
+    }
+
+    .cell.wrong-location {
+        @apply bg-yellow-500 border-yellow-500
+    }
+
+    [data-role='key'].correct {
+        @apply bg-green-700
+    }
+
+    [data-role='key'].wrong {
+        @apply bg-neutral-700
+    }
+
+    [data-role='key'].wrong-location {
+        @apply bg-yellow-500
+    }
+}

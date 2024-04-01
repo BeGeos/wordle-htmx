@@ -1,0 +1,15 @@
+---
+import type { Cell } from '../../stores/grid';
+
+import WordleCell from './Cell.astro';
+
+interface Props {
+  values: Cell[];
+}
+
+const { values } = Astro.props;
+---
+
+<section id='wordle-grid' class='grid grid-cols-5 gap-2 grid-rows-6 my-12'>
+  {values.map((cell) => <WordleCell {...cell} />)}
+</section>
